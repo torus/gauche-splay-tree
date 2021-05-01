@@ -1,4 +1,5 @@
 ; Splay tree
+(use gauche.process)
 
 (define left car)
 (define value cadr)
@@ -96,3 +97,24 @@
 
 (define tree
   '(() 0 (() 1 (() 2 (() 3 (() 4 (() 5 (() 6 (() 7 ())))))))))
+
+(define (print-tree tree)
+  (define dummy 0)
+  (define (iter tree parent)
+    (if (pair? tree)
+        (let* ((val (value tree))
+               (node #"n~val"))
+          (iter (left tree) node)
+          (print #"~node [label = \"~|val|\"];")
+          (when parent
+            (print #"~parent -- ~|node|;"))
+          (iter (right tree) node))
+        (let ((dum #"dum~dummy"))
+          (print #"~dum [style=\"\" label=\"\" height=0.1 width=0.1];")
+          (print #"~parent -- ~dum [style=\"\"];")
+          (inc! dummy))))
+  (with-output-to-process "dot -Tpng -o out.png"
+    (^[]
+      (print "graph \"\" {")
+      (iter tree #f)
+      (print "}"))))
