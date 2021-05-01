@@ -48,8 +48,8 @@
   (let loop ((path ())
              (root tree)
              (dir 'root))
-    (if (eq? #?=(value root) x)
-        (splay (cons (cons dir #?=root) path))
+    (if (eq? (value root) x)
+        (splay (cons (cons dir root) path))
         (if (< x (value root))
             (loop (cons (cons dir root) path) (left  root) 'left)
             (loop (cons (cons dir root) path) (right root) 'right)))))
@@ -57,7 +57,6 @@
 ;; (p1 p2 p3 p4 ...)
 
 (define (splay-1 path x p)
-  #?=(map (^x (list 1 (car x) (value (cdr x)))) path)
   (let ((d1 (car (car   path)))
         (d2 (car (cadr  path))))
     (let ((new-path
@@ -67,7 +66,6 @@
       (splay new-path))))
 
 (define (splay-2 path x p g)
-  #?=(map (^x (list 2 (car x) (value (cdr x)))) path)
   (let ((d1 (car (car   path)))
         (d2 (car (cadr  path)))
         (d3 (car (caddr path))))
@@ -82,7 +80,6 @@
       (splay new-path))))
 
 (define (splay path)
-  #?=(map (^x (list 0 (car x) (value (cdr x)))) path)
   (let ((x (cdr (car path))))
         (if (pair? (cdr path))
             (let ((p (cdr (cadr path))))
@@ -91,9 +88,6 @@
                     (splay-2 path x p g))
                   (splay-1 path x p)))
             x)))
-
-#;(define tree
-  '((((((((() 0 ()) 1 ()) 2 ()) 3 ()) 4 ()) 5 ()) 6 ()) 7 ()))
 
 (define tree
   '(() 0 (() 1 (() 2 (() 3 (() 4 (() 5 (() 6 (() 7 ())))))))))
