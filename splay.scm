@@ -45,12 +45,13 @@
 
 (define (search tree x)
   (let loop ((path ())
-             (root tree))
+             (root tree)
+             (dir 'root))
     (if (eq? #?=(value root) x)
-        (splay (cons (cons 'found #?=root) path))
+        (splay (cons (cons dir #?=root) path))
         (if (< x (value root))
-            (loop (cons (cons 'left root) path) (left root))
-            (loop (cons (cons 'right root) path) (right root))))))
+            (loop (cons (cons dir root) path) (left  root) 'left)
+            (loop (cons (cons dir root) path) (right root) 'right)))))
 ;; <- bottom   top->
 ;; (p1 p2 p3 p4 ...)
 
