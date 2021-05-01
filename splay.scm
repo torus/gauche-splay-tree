@@ -89,9 +89,8 @@
                   (splay-1 path x p)))
             x)))
 
-(define (go-left tree path)
+(define (go-left path)
   (let ((current (cdar path)))
-    #?=(value current)
     (if (left current)
         (let loop ((path (cons (cons 'left (left current)) path))
                    (current (left current)))
@@ -103,9 +102,8 @@
             (cdr path)
             (cddr path)))))
 
-(define (go-right tree path)
+(define (go-right path)
   (let ((current (cdar path)))
-    #?=(value current)
     (if (right current)
         (let loop ((path (cons (cons 'right (right current)) path))
                    (current (right current)))
