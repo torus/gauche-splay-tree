@@ -103,6 +103,20 @@
             (cdr path)
             (cddr path)))))
 
+(define (go-right tree path)
+  (let ((current (cdar path)))
+    #?=(value current)
+    (if (right current)
+        (let loop ((path (cons (cons 'right (right current)) path))
+                   (current (right current)))
+          (if (pair? (left #?=current))
+              (loop (cons (cons 'left (left current)) path)
+                    (left current))
+              path))
+        (if (eq? (caar path) 'left)
+            (cdr path)
+            (cddr path)))))
+
 (define tree
   '(() 0 (() 1 (() 2 (() 3 (() 4 (() 5 (() 6 (() 7 ())))))))))
 
