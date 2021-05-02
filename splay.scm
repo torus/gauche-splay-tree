@@ -44,6 +44,11 @@
                (value x)
                (make-tree b (value p) a))))
 
+;; path: ( (direction . node) ... )
+;; directoin: 'left or 'right or 'root
+
+;; search only works on numerical data
+;; returns path
 (define (search tree x)
   (let loop ((path ())
              (root tree)
@@ -53,8 +58,6 @@
         (if (< x (value root))
             (loop (cons (cons dir root) path) (left  root) 'left)
             (loop (cons (cons dir root) path) (right root) 'right)))))
-;; <- bottom   top->
-;; (p1 p2 p3 p4 ...)
 
 (define (splay-1 path x p)
   (let ((d1 (car (car   path)))
@@ -79,6 +82,7 @@
                    (cons (cons d3 (zig-zag-right x p g)) (cdddr path))))))
       (splay new-path))))
 
+;; path -> tree
 (define (splay path)
   (let ((x (cdr (car path))))
         (if (pair? (cdr path))
@@ -89,6 +93,7 @@
                   (splay-1 path x p)))
             x)))
 
+;; path -> path
 (define (go-left path)
   (let ((current (cdar path)))
     (if (pair? (left current))
@@ -115,8 +120,14 @@
             (cdr path)
             (cddr path)))))
 
-(define tree
-  '(() "h" (() "e" (() "l" (() "l" (() "o" (() " " (() "w" (() "o" ())))))))))
+;; tree -> tree
+(define (insert-left tree val)
+  (make-tree (left tree) val (make-tree () (value tree) (right tree))))
+
+(define (insert-right tree val)
+  (make-tree (make-tree (left tree) (value tree) ()) val (right tree)))
+
+;;;;;;
 
 (define (print-tree tree)
   (define id 0)
@@ -142,5 +153,17 @@
 
 
 ;;;;;
-(print-tree (splay (fold (^[p tree] (p tree)) `((root . ,tree))
-                         (list go-right go-right go-right go-left))))
+
+(define (test)
+  (define tree
+    '(() "h" (() "e" (() "l" (() "l" (() "o" (() " " (() "w" (() "o" ())))))))))
+
+  (define (go tree . ops)
+    (splay (fold (^[p tree] (p tree)) `((root . ,tree))
+                             ops)))
+
+  (print-tree
+   (insert-left (go (insert-right
+                     (go tree go-right go-right go-right go-left) "x")
+                    go-right go-right go-right)
+                "y")))
