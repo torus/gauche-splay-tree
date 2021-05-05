@@ -51,22 +51,28 @@
         (make-splay-tree (car rights) #f (new-tree (cdr rights)))
         (car rights)))
 
-  (define (iter node i rights)
+  (define (iter node i rights parent new-root)
     (if (and (< (rope-calc-weight! node) i)
              (pair? (splay-right node)))
-        (iter (splay-right node) (- i (rope-calc-weight! node)) rights)
+        (iter (splay-right node) (- i (rope-calc-weight! node)) rights node new-root)
         (if (pair? (splay-left node))
-            (iter (splay-left node) i
-                  (if (pair? (splay-right node))
-                      (let ((right (splay-right node)))
-                        (set! (splay-value node) #f)
-                        (set! (splay-right node) ())
-                        (cons right rights))
-                      rights))
-            (new-tree rights))))
+            (begin
+              (set! (splay-value node) #f)
+              (if parent
+                  (set! (splay-right parent) (splay-left node))
+                  (set! new-root (splay-left node)))
+              (iter (splay-left node) i
+                    (if (pair? (splay-right node))
+                        (let ((right (splay-right node)))
+                          (set! (splay-value node) #f)
+                          (set! (splay-right node) ())
+                          (cons right rights))
+                        rights)
+                    parent new-root))
+            (values new-root (new-tree rights)))))
 
-  (let ((right (iter node i ())))
-    (values node right)))
+  (let-values (((left right) (iter node i () #f node)))
+    (values left right)))
 
 
 (define (rope-insert! node i new-node)
