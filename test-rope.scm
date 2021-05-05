@@ -20,10 +20,10 @@
 
   #?=(rope-index con 6)
 
-  (let ((right-half (rope-split! con 6)))
-    (draw! con)
+  (let-values (((left-half right-half) (rope-split! con 6)))
+    (draw! left-half)
     (draw! right-half)
-    (set! con (rope-concat con right-half))
+    (set! con (rope-concat left-half right-half))
     (draw! con)
     )
 

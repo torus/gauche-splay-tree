@@ -43,8 +43,8 @@
 (define (rope-concat node1 node2)
   (make-splay-tree node1 #f node2))
 
-;; The original node gets modified.
-;; Returns the right half tree split from the original.
+;; The original node may get modified.
+;; Returns the left and the right trees.
 (define (rope-split! node i)
   (define (new-tree rights)
     (if (pair? (cdr rights))
@@ -64,14 +64,16 @@
                         (cons right rights))
                       rights))
             (new-tree rights))))
-  (iter node i ()))
+
+  (let ((right (iter node i ())))
+    (values node right)))
 
 
 (define (rope-insert! node i new-node)
-  (let ((right (rope-split! node i)))
-    (rope-concat node (rope-concat new-node right))))
+  (let-values (((left right) (rope-split! node i)))
+    (rope-concat left (rope-concat new-node right))))
 
 (define (rope-delete! node i j)
-  (let ((right (rope-split! node j)))
-    (rope-split! node i)
-    (rope-concat node right)))
+  (let-values (((node right) (rope-split! node j)))
+    (let-values (((node middle) (rope-split! node i)))
+      (rope-concat node right))))
