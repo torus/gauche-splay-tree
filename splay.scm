@@ -1,5 +1,16 @@
-; Splay tree
-(use gauche.process)
+(define-module splay
+  (export
+   make-splay-tree
+   splay
+   splay-insert-left
+   splay-insert-right
+   splay-go-left
+   splay-go-right
+   splay-left
+   splay-right
+   splay-value))
+
+(select-module splay)
 
 (define left car)
 (define value cadr)
@@ -127,43 +138,13 @@
 (define (insert-right tree val)
   (make-tree (make-tree (left tree) (value tree) ()) val (right tree)))
 
-;;;;;;
-
-(define (print-tree tree)
-  (define id 0)
-  (define (iter tree parent)
-    (if (pair? tree)
-        (let* ((val (value tree))
-               (node #"n~id"))
-          (inc! id)
-          (iter (left tree) node)
-          (print #"~node [label = \"~|val|\"];")
-          (when parent
-            (print #"~parent -- ~|node|;"))
-          (iter (right tree) node))
-        (let ((dum #"dum~id"))
-          (print #"~dum [style=\"\" label=\"\" height=0.1 width=0.1];")
-          (print #"~parent -- ~dum [style=\"\"];")
-          (inc! id))))
-  (with-output-to-process "dot -Tpng -o out.png"
-    (^[]
-      (print "graph \"\" {")
-      (iter tree #f)
-      (print "}"))))
-
-
 ;;;;;
 
-(define (test)
-  (define tree
-    '(() "h" (() "e" (() "l" (() "l" (() "o" (() " " (() "w" (() "o" ())))))))))
-
-  (define (go tree . ops)
-    (splay (fold (^[p tree] (p tree)) `((root . ,tree))
-                             ops)))
-
-  (print-tree
-   (insert-left (go (insert-right
-                     (go tree go-right go-right go-right go-left) "x")
-                    go-right go-right go-right)
-                "y")))
+(define make-splay-tree make-tree)
+(define splay-insert-left insert-left)
+(define splay-insert-right insert-right)
+(define splay-go-left go-left)
+(define splay-go-right go-right)
+(define splay-left left)
+(define splay-right right)
+(define splay-value value)
