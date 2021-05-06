@@ -18,7 +18,7 @@
 
   (draw! con)
 
-  #?=(rope-index con 6)
+  #?=(rope-index con 11)
 
   (let-values (((left-half right-half) (rope-split! con 6)))
     (draw! left-half)
@@ -28,6 +28,9 @@
     )
 
   (set! con (rope-insert! con 6 (make-rope " R" "ope")))
+
+  #?=(rope-index con 11)
+
   (draw! con)
 
   (set! con (rope-delete! con 3 8))
