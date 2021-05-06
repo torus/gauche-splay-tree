@@ -33,12 +33,15 @@
       (string-length (splay-value node))))
 
 (define (rope-index node i)
-  (if (and (<= (rope-calc-weight! node) i)
-           (pair? (splay-right node)))
-      (rope-index (splay-right node) (- i (rope-calc-weight! node)))
-      (if (pair? (splay-left node))
-          (rope-index (splay-left node) i)
-          (string-ref (splay-value node) i))))
+  (define (iter node i path)
+    (if (and (<= (rope-calc-weight! node) i)
+             (pair? (splay-right node)))
+        (iter (splay-right node) (- i (rope-calc-weight! node))
+              (cons (cons 'right (splay-right node)) path))
+        (if (pair? (splay-left node))
+            (iter (splay-left node) i (cons (cons 'left (splay-left node)) path))
+            (values (string-ref (splay-value node) i) (cdr path)))))
+  (iter node i `((root . ,node))))
 
 (define (rope-concat node1 node2)
   (make-splay-tree node1 #f node2))
@@ -54,7 +57,8 @@
   (define (iter node i rights parent new-root)
     (if (and (< (rope-calc-weight! node) i)
              (pair? (splay-right node)))
-        (iter (splay-right node) (- i (rope-calc-weight! node)) rights node new-root)
+        (iter (splay-right node) (- i (rope-calc-weight! node))
+              rights node new-root)
         (if (pair? (splay-left node))
             (begin
               (set! (splay-value node) #f)
@@ -71,8 +75,10 @@
                     parent new-root))
             (values new-root (new-tree rights)))))
 
-  (let-values (((left right) (iter node i () #f node)))
-    (values left right)))
+  (let-values (((node path) (rope-index node i)))
+    (let ((splayed (splay path (^n (set! (splay-value n) #f)))))
+      (let-values (((left right) (iter splayed i () #f node)))
+        (values left right)))))
 
 
 (define (rope-insert! node i new-node)
