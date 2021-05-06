@@ -94,12 +94,15 @@
       (splay new-path))))
 
 ;; path -> tree
-(define (splay path)
+(define (splay path :optional (proc (^[])))
   (let ((x (cdr (car path))))
         (if (pair? (cdr path))
             (let ((p (cdr (cadr path))))
+              (proc x)
+              (proc p)
               (if (pair? (cddr path))
                   (let ((g (cdr (caddr path))))
+                    (proc g)
                     (splay-2 path x p g))
                   (splay-1 path x p)))
             x)))
